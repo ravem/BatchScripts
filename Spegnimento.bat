@@ -1,5 +1,14 @@
 @echo off
 SETLOCAL EnableDelayedExpansion
+
+REM Questo script spegne una lista di computer (Windows o Linux)
+REM usando plink e lo shutdown remoto.
+REM Il file computer.txt deve contenere una lista degli indirizzi ip
+REM delle macchine da spegnere.
+REM Dopo lo shutdown viene effettuato un controllo tramite ping sulle 
+REM macchina per verificare se sono ancora accese e viene proposta 
+REM la scelta all'utente su come procedere.
+
 echo --------------------------------------------------------------------
 echo Inizio lo spegnimento delle macchine
 echo --------------------------------------------------------------------
