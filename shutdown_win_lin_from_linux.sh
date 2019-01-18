@@ -1,6 +1,7 @@
 #!/bin/bash
 
 #Creo la funzione che mi consente di eseguire le sequenze di comandi
+#always be blessed https://bobcopeland.com/blog/2012/10/goto-in-bash/
 function jumpto
 {
     label=$1
