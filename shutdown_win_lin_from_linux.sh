@@ -33,7 +33,7 @@ echo"" |tee -a log.txt
 echo "Lancio lo shutdown dei computer windows accesi" |tee -a log.txt
 	IFS=$IFS,
 		while read ip name; do
-			ping -c1 -W1 $ip >/dev/null && net rpc shutdown -I $ip -f -t 50 -C 'Powering off' -U USERNAME%PASSWORD |& tee -a log.txt && echo "Ho lanciato lo shutdown di $name" | tee -a log.txt
+			ping -c1 -W1 $ip >/dev/null && net rpc shutdown -I $ip -f -t 1 -C 'Powering off' -U USERNAME%PASSWORD |& tee -a log.txt && echo "Ho lanciato lo shutdown di $name" | tee -a log.txt
 		done < win.txt
 
 pause
