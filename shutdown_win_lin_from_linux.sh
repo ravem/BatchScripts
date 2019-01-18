@@ -19,72 +19,76 @@ start:
 echo "*****************************************************"  |tee -a log.txt
 
 #Prendo una lista esterna costruita con IP,NOMEMACCHINA e pingo una volta IP per vedere se la macchina è accesa, 
-#se lo è mando lo shutdown, scrivo nel log. La presenza di && fa si che cio che sta a destra venga eseguito 
-#solo se lo statuscode del ping è zero, quindi ha avuto successo. (ci sarebbe da discutere ma per la mia situazione va bene così)
-#richiede sshpass per non dover digitare ogni volta la password e rpc
+#se lo è mando lo shutdown, scrivo nel log. 
 
 
-echo "Controllo i computer linux accesi e lancio lo shutdown" |tee -a log.txt
+echo "Lancio lo shutdown dei computer linux accesi" |tee -a log.txt
 	IFS=$IFS,
 		while read ip name; do 
-			ping -c1 -W1 $ip >/dev/null && sshpass -p PASSWORD ssh -o StrictHostKeyChecking=no -t -t USERNAME@$ip ' sudo poweroff' |& tee -a log.txt  && echo "Ho spento $name" |& tee -a log.txt 
+			ping -c1 -W1 $ip >/dev/null && sshpass -p PASSWORD ssh -o StrictHostKeyChecking=no -t -t USERNAME@$ip ' sudo poweroff' |& tee -a log.txt  && echo "Ho lanciato lo shutdown di $name" |& tee -a log.txt 
 		done < linux.txt
 
 echo"" |tee -a log.txt
-echo "Controllo i computer windows accesi e lancio lo shutdown" |tee -a log.txt
+echo "Lancio lo shutdown dei computer windows accesi" |tee -a log.txt
 	IFS=$IFS,
 		while read ip name; do
-			ping -c1 -W1 $ip && net rpc shutdown -I $ip -f -t 10 -C 'Powering off' -U USERNAME%PASSWORD && echo "Spengo $name" |& tee -a log.txt
+			ping -c1 -W1 $ip >/dev/null && net rpc shutdown -I $ip -f -t 50 -C 'Powering off' -U USERNAME%PASSWORD |& tee -a log.txt && echo "Ho lanciato lo shutdown di $name" | tee -a log.txt
 		done < win.txt
 
+pause
 
 jumpto mid
 
 mid:
+sleep 5
+
 clear
 
-#Metto un timer di 32 secondi per essere ragionevolmente sicuro che tutto si spenga
+#Metto un timer di 40 secondi per essere ragionevolmente sicuro che tutto si spenga
 echo "Per favore attendi che i computer si spengano"
-	for i in {0..15}; do echo -ne "\033[0;31m$i\033[0m"'\r'; sleep 4; done; echo
+	for i in {9..0}; do echo -ne "\033[0;31m$i\033[0m"'\r'; sleep 4; done; echo
 
 
 #Faccio una seconda passata per vedere se qualcosa altro è acceso e avviso
-echo"" |tee -a log.txt
+echo "" |tee -a log.txt
 
 clear
 
-echo "Controllo cosa è ancora acceso" |tee -a log.txt
+echo "Controllo se qualcosa è ancora acceso" |tee -a log.txt
 	IFS=$IFS,
 		while read ip name; do 
-			ping -c1 -W1 $ip >/dev/null && echo "$name è ancora acceso, aspetta che verifico" || echo "$name è spento" |& tee -a log.txt
+			ping -c2 -W2 $ip >/dev/null && echo "$name è ancora acceso, devo ricontrollarlo" |& tee -a log.txt || echo "$name è spento" |& tee -a log.txt
 		done < linux.txt
 
 	IFS=$IFS,
 		while read ip name; do
-			ping -c1 -W1 $ip >/dev/null && echo "$name è ancora acceso, aspetta che verifico" || echo "$name è spento" |& tee -a log.txt
-		done < windows.txt
+			ping -c2 -W2 $ip >/dev/null && echo "$name è ancora acceso, devo ricontrollarlo" |& tee -a log.txt || echo "$name è spento" |& tee -a log.txt
+		done < win.txt
 
-clear
 
-#Metto un timer di 32 secondi per essere ragionevolmente sicuro che tutto si spenga
+#Metto un timer di 10 secondi per essere ragionevolmente sicuro che tutto si spenga
+echo "" 
 echo "Per favore attendi ancora dieci secondi"
 	for i in {9..0}; do echo -ne "\033[0;31m$i\033[0m"'\r'; sleep 1; done; echo
 
-echo"" |tee -a log.txt
+echo "" |& tee -a log.txt
+
 clear
-echo "Ricontrollo cosa è ancora acceso" |tee -a log.txt
+
+echo ""|& tee -a log.txt
+echo "Secondo e ultimo controllo" |tee -a log.txt
 	IFS=$IFS,
 		while read ip name; do 
-			ping -c1 -W1 $ip >/dev/null && echo "\033[0;31m$name è ancora acceso, verifica manualmente\033[0m" || echo "$name è spento" |& tee -a log.txt
+			ping -c2 -W2 $ip >/dev/null && echo -e "\e[0;31m$name è ancora acceso, verifica!\e[0m" && echo "$name è ancora acceso" >> log.txt || echo -e "\e[0;32m$name è spento\e[0m" && echo "$name è spento" >> log.txt
 		done < linux.txt
-cls
 
 	IFS=$IFS,
 		while read ip name; do
-			ping -c1 -W1 $ip >/dev/null && echo "\033[0;31m$name è ancora acceso, verifica manualmente\033[0m" || echo "$name è spento" |& tee -a log.txt
+			ping -c2 -W2 $ip >/dev/null && echo -e "\e[0;31m$name è ancora acceso, verifica!\e[0m" && echo "$name è rimasto acceso" >> log.txt 
 		done < win.txt
 
 #Chiudo il log
+
 echo "*****************************************************"  |tee -a log.txt
 
 
@@ -94,5 +98,3 @@ finish:
 
 #Comprimo il file di log e lo rinomino con la data
 gzip log.txt && mv log.txt.gz log_`date +%d%b%Y_%H:%M:%S`.gz
-
-quit
