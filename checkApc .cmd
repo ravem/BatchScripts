@@ -63,6 +63,10 @@ GOTO :QUIT
 
 
 :QUIT
+
+IF %ERRORLEVEL% NEQ 0 Echo Task run on %DATE% at %TIME%, an error was found (error %ERRORLEVEL%) >>ExecutionLog.txt
+IF %ERRORLEVEL% EQU 0 Echo Task run on %DATE% at %TIME%, no error was found >>ExecutionLog.txt
+
 exit
 
 
