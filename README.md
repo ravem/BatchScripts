@@ -26,6 +26,7 @@ Come spegnere una macchina Linux da Windows
 Controllo di un UPS APC via rete (snmp) e monitoraggio dello stato via notifiche Telegram. 
 
 **Telegram_certbot_notifier.sh**
-Controllo di un UPS APC via rete (snmp) e monitoraggio dello stato via notifiche Telegram. 
+Questo script crea un log ad ogni esecuzione del task programmato per rinnovare dei certificati con certbot e ne invia il contenuto via Telegram.
+Utile per verificare che il task giri correttamente e correggere eventuali problemi nei rinnovi, per tempo.
 
 
