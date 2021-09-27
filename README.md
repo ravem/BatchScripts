@@ -24,3 +24,8 @@ Come spegnere una macchina Linux da Windows
 
 **checkApc.cmd**
 Controllo di un UPS APC via rete (snmp) e monitoraggio dello stato via notifiche Telegram. 
+
+**Telegram_certbot_notifier.sh**
+Controllo di un UPS APC via rete (snmp) e monitoraggio dello stato via notifiche Telegram. 
+
+
